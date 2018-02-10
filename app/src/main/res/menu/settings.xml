@@ -1,0 +1,39 @@
+<menu xmlns:tools="http://schemas.android.com/tools"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <item
+        android:id="@+id/addTp"
+        android:title="@string/selectTp"
+		android:onClick="showSelectTpDialog"
+		android:icon="@drawable/add_note"
+		android:showAsAction="ifRoom"
+		tools:ignore="AppCompatResource" />
+
+	<item
+        android:id="@+id/addCount"
+        android:title="@string/selectCount"
+		android:onClick="showSelectCountDialog"
+		android:icon="@drawable/addcount"
+		android:showAsAction="ifRoom"
+		tools:ignore="AppCompatResource" />
+
+	<item
+		android:id="@+id/lightToggle"
+		android:title="LED OFF"
+		android:icon="@drawable/lightoff"
+		android:showAsAction="ifRoom"
+		tools:ignore="AppCompatResource"
+		android:onClick="turnLed"/>
+
+	<item
+        android:id="@+id/statisticByCount"
+        android:title="@string/statisticByCount"
+	/>
+
+	<item
+		android:id="@+id/exit"
+		android:title="@string/exit"
+		android:onClick="showExitDialog"
+		/>
+    
+</menu>

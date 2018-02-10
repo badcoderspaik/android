@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="@drawable/background">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="25dp"
+            android:layout_margin="5px"
+            android:padding="5px"
+            android:gravity="center_horizontal"
+            android:background="#B8A848"
+            android:textSize="18sp"
+            android:textColor="#38340B"
+            android:textStyle="bold"
+            android:text="ТП"
+            android:layout_weight="1.0"/>
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_margin="5px"
+            android:padding="5px"
+            android:gravity="center_horizontal"
+            android:background="#B8A848"
+            android:textColor="#38340B"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:text="Счетчик"
+            android:layout_weight="1.0"/>
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="60dp"
+            android:layout_margin="5px"
+            android:padding="5px"
+            android:gravity="center_horizontal"
+            android:background="#B8A848"
+            android:textColor="#38340B"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:text="Показания"
+            android:layout_weight="1.0"/>
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_margin="5px"
+            android:padding="5px"
+            android:gravity="center_horizontal"
+            android:background="#B8A848"
+            android:textColor="#38340B"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:text="Дата"
+            android:layout_weight="1.0"/>
+
+    </LinearLayout>
+
+    <ListView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/mainListView1"/>
+
+</LinearLayout>
