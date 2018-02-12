@@ -57,7 +57,7 @@ public class DbHelper extends SQLiteOpenHelper implements DbHelperHandler {
     }
 
     @Override
-    public void getCountByNumber(ArrayList<Item> values, TableAdapter tableadapter, int countNumber) {
+    public void getStatisticByCount(int countNumber, ArrayList<Item> values, TableAdapter tableadapter) {
         SQLiteDatabase dbReader = getReadableDatabase();
         Cursor cursor = dbReader.rawQuery("SELECT * FROM "+TABLE_NAME+" WHERE "+COUNT_NUMBER+"="+countNumber+" ORDER BY "+ID_KEY+";", null);
         if(cursor.moveToFirst()){

@@ -21,7 +21,15 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".StatisticByCountActivity"></activity>
+        <activity android:name=".StatisticByCountActivity"
+                  android:label="@string/statisticByCount"
+            android:parentActivityName=".MainActivity">
+
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+
+        </activity>
 
     </application>
 

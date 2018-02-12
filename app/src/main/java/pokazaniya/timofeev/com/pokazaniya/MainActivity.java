@@ -3,6 +3,7 @@ package pokazaniya.timofeev.com.pokazaniya;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     Parameters parameters;
     boolean ledIsChecked = false;
     Menu menu;
+    String[] countList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         count10 = getResources().getStringArray(R.array.count)[10];
         count11 = getResources().getStringArray(R.array.count)[11];
 
-
+        countList = getResources().getStringArray(R.array.count);
 
         tableadapter = new TableAdapter(this, values);
         thisListView = (ListView)findViewById(R.id.mainListView1);
@@ -218,7 +220,6 @@ public class MainActivity extends AppCompatActivity {
                 builder.setSingleChoiceItems(tpList, -1, addTpListener);
                 return builder.create();
             case 2:
-                String[] countList = getResources().getStringArray(R.array.count);
                 builder = new AlertDialog.Builder(this);
                 builder.setTitle(R.string.selectCount);
                 builder.setSingleChoiceItems(countList, -1, addCountListener);
@@ -246,6 +247,11 @@ public class MainActivity extends AppCompatActivity {
                 builder.setIcon(R.drawable.alert);
                 builder.setPositiveButton(R.string.remove, removeRecordListener);
                 builder.setNegativeButton(R.string.no, removeRecordListener);
+                return builder.create();
+            case 6:
+                builder = new AlertDialog.Builder(this);
+                builder.setTitle(R.string.statisticByCount);
+                builder.setItems(countList, statisticByCountListener);
                 return builder.create();
 
             default: return null;
@@ -361,7 +367,7 @@ public class MainActivity extends AppCompatActivity {
             switch(which){
                 case Dialog.BUTTON_POSITIVE:
                     String value = et.getText().toString();
-                    db.changeRecord(getItem, id,  value, values, tableadapter);
+                    db.changeRecord(getItem, id, value, values, tableadapter);
                     break;
                 case Dialog.BUTTON_NEGATIVE:
                     break;
@@ -388,6 +394,57 @@ public class MainActivity extends AppCompatActivity {
 
     };
 
+    DialogInterface.OnClickListener statisticByCountListener = new DialogInterface.OnClickListener(){
+
+        @Override
+        public void onClick(DialogInterface dialogInterface, int position) {
+            Intent statisticByCountIntent = new Intent(MainActivity.this, StatisticByCountActivity.class);
+            switch (position){
+                case 0:
+                    sendMessage(statisticByCountIntent, 100964);
+                    break;
+                case 1:
+                    sendMessage(statisticByCountIntent, 160000);
+                    break;
+                case 2:
+                    sendMessage(statisticByCountIntent, 215110);
+                    break;
+                case 3:
+                    sendMessage(statisticByCountIntent, 995258);
+                    break;
+                case 4:
+                    sendMessage(statisticByCountIntent, 19250);
+                    break;
+                case 5:
+                    sendMessage(statisticByCountIntent, 114489);
+                    break;
+                case 6:
+                    sendMessage(statisticByCountIntent, 215933);
+                    break;
+                case 7:
+                    sendMessage(statisticByCountIntent, 516465);
+                    break;
+                case 8:
+                    sendMessage(statisticByCountIntent, 820943);
+                    break;
+                case 9:
+                    sendMessage(statisticByCountIntent, 835057);
+                    break;
+                case 10:
+                    sendMessage(statisticByCountIntent, 20297549);
+                    break;
+                case 11:
+                    sendMessage(statisticByCountIntent, 20309187);
+                    break;
+            }
+        }
+    };
+
+    private void sendMessage(Intent intent, int countNumber){
+        intent.putExtra("countNumber", countNumber);
+        startActivity(intent);
+    }
+
     public void showSelectTpDialog(MenuItem item){
         showDialog(1);
     }
@@ -404,5 +461,7 @@ public class MainActivity extends AppCompatActivity {
     public void showExitDialog(MenuItem item){
         showDialog(4);
     }
+
+    public void showStatisticByCountDialog(MenuItem item){showDialog(6);}
 
 }
