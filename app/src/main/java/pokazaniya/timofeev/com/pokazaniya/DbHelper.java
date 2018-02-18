@@ -13,14 +13,14 @@ import java.util.Date;
 
 public class DbHelper extends SQLiteOpenHelper implements DbHelperHandler {
 
-    private static final int DB_VERSION = 1;
-    private static final String DB_NAME = "pokazaniya";
-    private static final String TABLE_NAME = "pok";
-    private static final String ID_KEY = "id";
-    private static final String TP_NUMBER = "tp_number";
-    private static final String COUNT_NUMBER = "count_number";
-    private static final String VALUE = "value";
-    private static final String DATE = "date";
+    public static final int DB_VERSION = 2;
+    public static final String DB_NAME = "pokazaniya";
+    public static final String TABLE_NAME = "pok";
+    public static final String ID_KEY = "_id";
+    public static final String TP_NUMBER = "tp_number";
+    public static final String COUNT_NUMBER = "count_number";
+    public static final String VALUE = "value";
+    public static final String DATE = "date";
     SimpleDateFormat format = new SimpleDateFormat("dd.MM.yy");
     private String query;
     Context context;
@@ -33,15 +33,22 @@ public class DbHelper extends SQLiteOpenHelper implements DbHelperHandler {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        query = "CREATE TABLE IF NOT EXISTS "+TABLE_NAME+"(id INTEGER PRIMARY KEY AUTOINCREMENT, tp_number TEXT, count_number TEXT, value TEXT, date TEXT)";
+        query = "CREATE TABLE IF NOT EXISTS "+TABLE_NAME+"("+ID_KEY+" INTEGER PRIMARY KEY AUTOINCREMENT, tp_number TEXT, count_number TEXT, value TEXT, date TEXT)";
         Toast.makeText(context, "База данных создана", Toast.LENGTH_SHORT).show();
         db.execSQL(query);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
-        db.execSQL("DROP TABLE IF EXISTS "+TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
+    }
+
+    @Override
+    public Cursor getAllRecords() {
+        SQLiteDatabase reader = getReadableDatabase();
+        Cursor cursor = reader.rawQuery("SELECT * FROM "+TABLE_NAME+";", null);
+        return cursor;
     }
 
     @Override
@@ -79,7 +86,7 @@ public class DbHelper extends SQLiteOpenHelper implements DbHelperHandler {
         cv.put(DATE, format.format(new Date()));
         dbWriter.insert(TABLE_NAME, null, cv);
 
-        Cursor cursor = dbReader.rawQuery("SELECT * FROM "+TABLE_NAME+" ORDER BY id DESC LIMIT 1;", null);
+        Cursor cursor = dbReader.rawQuery("SELECT * FROM "+TABLE_NAME+" ORDER BY "+ID_KEY+" DESC LIMIT 1;", null);
         if(cursor.moveToFirst()){
             values.add(new Item(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4)));
             tableadapter.notifyDataSetChanged();
@@ -87,6 +94,16 @@ public class DbHelper extends SQLiteOpenHelper implements DbHelperHandler {
 
         dbWriter.close();
         dbReader.close();
+    }
+
+    public  void addRecord(String tp, String count){
+        SQLiteDatabase writer = getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(TP_NUMBER, tp);
+        cv.put(COUNT_NUMBER, count);
+        cv.put(VALUE, "");
+        cv.put(DATE, format.format(new Date()));
+        writer.insert(TABLE_NAME, null, cv);
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     boolean ledIsChecked = false;
     Menu menu;
     String[] countList;
+    Cursor cursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +81,15 @@ public class MainActivity extends AppCompatActivity {
         view = inflater.inflate(R.layout.setvalue, null);
         et = (EditText)view.findViewById(R.id.setvalue);
 
-        db.getFullTable(values, tableadapter);
+        //db.getFullTable(values, tableadapter);
         registerForContextMenu(thisListView);
+
+        cursor = db.getAllRecords();
+        startManagingCursor(cursor);
+        String[] from = {DbHelper.TP_NUMBER, DbHelper.COUNT_NUMBER, DbHelper.VALUE, DbHelper.DATE};
+        int[] to = {R.id.tableTextView1, R.id.tableTextView2, R.id.tableTextView3, R.id.tableTextView4};
+        SimpleCursorAdapter sca = new SimpleCursorAdapter(this, R.layout.table, cursor, from, to);
+        thisListView.setAdapter(sca);
     }
 
     private  void showMessage(String message){
@@ -266,28 +276,34 @@ public class MainActivity extends AppCompatActivity {
         {
             switch(position){
                 case 0:
-                    db.addTpOrCount(tp309, count0, values, tableadapter);
-                    db.addTpOrCount(tp309, count1, values, tableadapter);
+                    db.addRecord(tp309, count0);
+                    db.addRecord(tp309, count1);
+                    cursor.requery();
                     break;
                 case 1:
-                    db.addTpOrCount(tp310, count2, values, tableadapter);
-                    db.addTpOrCount(tp310, count3, values, tableadapter);
-                    db.addTpOrCount(tp310, count4, values, tableadapter);
-                    db.addTpOrCount(tp310, count5, values, tableadapter);
+                    db.addRecord(tp310, count2);
+                    db.addRecord(tp310, count3);
+                    db.addRecord(tp310, count4);
+                    db.addRecord(tp310, count5);
+                    cursor.requery();
                     break;
                 case 2:
-                    db.addTpOrCount(tp311, count6, values, tableadapter);
-                    db.addTpOrCount(tp311, count7, values, tableadapter);
+                    db.addRecord(tp311, count6);
+                    db.addRecord(tp311, count7);
+                    cursor.requery();
                     break;
                 case 3:
-                    db.addTpOrCount(tp312, count8, values, tableadapter);
-                    db.addTpOrCount(tp312, count9, values, tableadapter);
+                    db.addRecord(tp312, count8);
+                    db.addRecord(tp312, count9);
+                    cursor.requery();
                     break;
                 case 4:
-                    db.addTpOrCount(tp313, count10, values, tableadapter);
+                    db.addRecord(tp313, count10);
+                    cursor.requery();
                     break;
                 case 5:
-                    db.addTpOrCount(tp314, count11, values, tableadapter);
+                    db.addRecord(tp314, count11);
+                    cursor.requery();
                     break;
             }
 
@@ -304,40 +320,52 @@ public class MainActivity extends AppCompatActivity {
         {
             switch(position){
                 case 0:
-                    db.addTpOrCount(tp309, count0, values, tableadapter);
+                    db.addRecord(tp309, count0);
+                    cursor.requery();
                     break;
                 case 1:
-                    db.addTpOrCount(tp309, count1, values, tableadapter);
+                    db.addRecord(tp309, count1);
+                    cursor.requery();
                     break;
                 case 2:
-                    db.addTpOrCount(tp310, count2, values, tableadapter);
+                    db.addRecord(tp310, count2);
+                    cursor.requery();
                     break;
                 case 3:
-                    db.addTpOrCount(tp310, count3, values, tableadapter);
+                    db.addRecord(tp310, count3);
+                    cursor.requery();
                     break;
                 case 4:
-                    db.addTpOrCount(tp310, count4, values, tableadapter);
+                    db.addRecord(tp310, count4);
+                    cursor.requery();
                     break;
                 case 5:
-                    db.addTpOrCount(tp310, count5, values, tableadapter);
+                    db.addRecord(tp310, count5);
+                    cursor.requery();
                     break;
                 case 6:
-                    db.addTpOrCount(tp311, count6, values, tableadapter);
+                    db.addRecord(tp311, count6);
+                    cursor.requery();
                     break;
                 case 7:
-                    db.addTpOrCount(tp311, count7, values, tableadapter);
+                    db.addRecord(tp311, count7);
+                    cursor.requery();
                     break;
                 case 8:
-                    db.addTpOrCount(tp312, count8, values, tableadapter);
+                    db.addRecord(tp312, count8);
+                    cursor.requery();
                     break;
                 case 9:
-                    db.addTpOrCount(tp312, count9, values, tableadapter);
+                    db.addRecord(tp312, count9);
+                    cursor.requery();
                     break;
                 case 10:
-                    db.addTpOrCount(tp313, count10, values, tableadapter);
+                    db.addRecord(tp313, count10);
+                    cursor.requery();
                     break;
                 case 11:
-                    db.addTpOrCount(tp314, count11, values, tableadapter);
+                    db.addRecord(tp314, count11);
+                    cursor.requery();
                     break;
             }
             showMessage("Счетчик добавлен");
