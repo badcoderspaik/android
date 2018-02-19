@@ -2,6 +2,7 @@ package pokazaniya.timofeev.com.pokazaniya;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -16,13 +17,16 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import java.util.ArrayList;
+import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v4.content.Loader;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     ArrayList<Item> values = new ArrayList<Item>();
     TableAdapter tableadapter;
@@ -45,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     Menu menu;
     String[] countList;
     Cursor cursor;
+    SimpleCursorAdapter simpleCursorAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,12 +89,15 @@ public class MainActivity extends AppCompatActivity {
         //db.getFullTable(values, tableadapter);
         registerForContextMenu(thisListView);
 
-        cursor = db.getAllRecords();
-        startManagingCursor(cursor);
+        /*cursor = db.getAllRecords();
+        startManagingCursor(cursor);*/
         String[] from = {DbHelper.TP_NUMBER, DbHelper.COUNT_NUMBER, DbHelper.VALUE, DbHelper.DATE};
         int[] to = {R.id.tableTextView1, R.id.tableTextView2, R.id.tableTextView3, R.id.tableTextView4};
-        SimpleCursorAdapter sca = new SimpleCursorAdapter(this, R.layout.table, cursor, from, to);
-        thisListView.setAdapter(sca);
+        simpleCursorAdapter = new SimpleCursorAdapter(this, R.layout.table, null, from, to, 0);
+        thisListView.setAdapter(simpleCursorAdapter);
+        getSupportLoaderManager().initLoader(0, null, this);
+        /*SimpleCursorAdapter sca = new SimpleCursorAdapter(this, R.layout.table, cursor, from, to);
+        */
     }
 
     private  void showMessage(String message){
@@ -278,32 +286,32 @@ public class MainActivity extends AppCompatActivity {
                 case 0:
                     db.addRecord(tp309, count0);
                     db.addRecord(tp309, count1);
-                    cursor.requery();
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                     break;
                 case 1:
                     db.addRecord(tp310, count2);
                     db.addRecord(tp310, count3);
                     db.addRecord(tp310, count4);
                     db.addRecord(tp310, count5);
-                    cursor.requery();
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                     break;
                 case 2:
                     db.addRecord(tp311, count6);
                     db.addRecord(tp311, count7);
-                    cursor.requery();
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                     break;
                 case 3:
                     db.addRecord(tp312, count8);
                     db.addRecord(tp312, count9);
-                    cursor.requery();
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                     break;
                 case 4:
                     db.addRecord(tp313, count10);
-                    cursor.requery();
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                     break;
                 case 5:
                     db.addRecord(tp314, count11);
-                    cursor.requery();
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                     break;
             }
 
@@ -312,7 +320,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
     };
-
     DialogInterface.OnClickListener addCountListener = new DialogInterface.OnClickListener(){
 
         @Override
@@ -321,19 +328,19 @@ public class MainActivity extends AppCompatActivity {
             switch(position){
                 case 0:
                     db.addRecord(tp309, count0);
-                    cursor.requery();
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                     break;
                 case 1:
                     db.addRecord(tp309, count1);
-                    cursor.requery();
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                     break;
                 case 2:
                     db.addRecord(tp310, count2);
-                    cursor.requery();
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                     break;
                 case 3:
                     db.addRecord(tp310, count3);
-                    cursor.requery();
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                     break;
                 case 4:
                     db.addRecord(tp310, count4);
@@ -341,31 +348,31 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case 5:
                     db.addRecord(tp310, count5);
-                    cursor.requery();
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                     break;
                 case 6:
                     db.addRecord(tp311, count6);
-                    cursor.requery();
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                     break;
                 case 7:
                     db.addRecord(tp311, count7);
-                    cursor.requery();
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                     break;
                 case 8:
                     db.addRecord(tp312, count8);
-                    cursor.requery();
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                     break;
                 case 9:
                     db.addRecord(tp312, count9);
-                    cursor.requery();
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                     break;
                 case 10:
                     db.addRecord(tp313, count10);
-                    cursor.requery();
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                     break;
                 case 11:
                     db.addRecord(tp314, count11);
-                    cursor.requery();
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                     break;
             }
             showMessage("Счетчик добавлен");
@@ -491,5 +498,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showStatisticByCountDialog(MenuItem item){showDialog(6);}
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return new DbCursorLoader(this, db);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        simpleCursorAdapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+    static class DbCursorLoader extends CursorLoader{
+        DbHelper db;
+
+        public DbCursorLoader(Context context, DbHelper db){
+            super(context);
+            this.db = db;
+        }
+
+        @Override
+        public Cursor loadInBackground() {
+            Cursor cursor = db.getAllRecords();
+            return cursor;
+        }
+    }
 
 }
