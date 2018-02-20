@@ -85,8 +85,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
         inflater = LayoutInflater.from(this);
         view = inflater.inflate(R.layout.setvalue, null);
         et = (EditText)view.findViewById(R.id.setvalue);
-
-        //db.getFullTable(values, tableadapter);
+        
         registerForContextMenu(thisListView);
 
         /*cursor = db.getAllRecords();
