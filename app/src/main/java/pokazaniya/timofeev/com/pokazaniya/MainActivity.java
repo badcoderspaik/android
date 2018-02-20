@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
         inflater = LayoutInflater.from(this);
         view = inflater.inflate(R.layout.setvalue, null);
         et = (EditText)view.findViewById(R.id.setvalue);
-        
+
         registerForContextMenu(thisListView);
 
         /*cursor = db.getAllRecords();
