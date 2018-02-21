@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
     View view;
     EditText et;
     int getItem;
-    int id;
+    long id;
     int temp;
     private String tp309, tp310, tp311, tp312, tp313, tp314;
     private String count0, count1, count2, count3, count4,
@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
     {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         getItem = info.position;
-        id = values.get(getItem).id;
+        id = info.id;
         temp = getItem + 1;
 
         switch(item.getItemId()){
@@ -343,7 +343,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
                     break;
                 case 4:
                     db.addRecord(tp310, count4);
-                    cursor.requery();
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                     break;
                 case 5:
                     db.addRecord(tp310, count5);
@@ -401,7 +401,8 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
             switch(which){
                 case Dialog.BUTTON_POSITIVE:
                     String value = et.getText().toString();
-                    db.changeRecord(getItem, id, value, values, tableadapter);
+                    db.changeRecord(id, value);
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                     break;
                 case Dialog.BUTTON_NEGATIVE:
                     break;
@@ -418,7 +419,8 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
         {
             switch(which){
                 case Dialog.BUTTON_POSITIVE:
-                    db.removeRecord(getItem, id, values, tableadapter);
+                    db.removeRecord(id);
+                    getSupportLoaderManager().getLoader(0).forceLoad();
                     showMessage("Запись "+temp+" удалена");
                     break;
                 case Dialog.BUTTON_NEGATIVE:
