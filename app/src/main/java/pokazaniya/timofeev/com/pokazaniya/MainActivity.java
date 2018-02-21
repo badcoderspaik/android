@@ -13,7 +13,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
+import android.view.View; 
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -95,8 +95,6 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
         simpleCursorAdapter = new SimpleCursorAdapter(this, R.layout.table, null, from, to, 0);
         thisListView.setAdapter(simpleCursorAdapter);
         getSupportLoaderManager().initLoader(0, null, this);
-        /*SimpleCursorAdapter sca = new SimpleCursorAdapter(this, R.layout.table, cursor, from, to);
-        */
     }
 
     private  void showMessage(String message){
