@@ -87,9 +87,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
         et = (EditText)view.findViewById(R.id.setvalue);
 
         registerForContextMenu(thisListView);
-
-        /*cursor = db.getAllRecords();
-        startManagingCursor(cursor);*/
+		
         String[] from = {DbHelper.TP_NUMBER, DbHelper.COUNT_NUMBER, DbHelper.VALUE, DbHelper.DATE};
         int[] to = {R.id.tableTextView1, R.id.tableTextView2, R.id.tableTextView3, R.id.tableTextView4};
         simpleCursorAdapter = new SimpleCursorAdapter(this, R.layout.table, null, from, to, 0);
@@ -283,32 +281,32 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
                 case 0:
                     db.addRecord(tp309, count0);
                     db.addRecord(tp309, count1);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
+                    update();
                     break;
                 case 1:
                     db.addRecord(tp310, count2);
                     db.addRecord(tp310, count3);
                     db.addRecord(tp310, count4);
                     db.addRecord(tp310, count5);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
+                    update();
                     break;
                 case 2:
                     db.addRecord(tp311, count6);
                     db.addRecord(tp311, count7);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
+                    update();
                     break;
                 case 3:
                     db.addRecord(tp312, count8);
                     db.addRecord(tp312, count9);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
+                    update();
                     break;
                 case 4:
                     db.addRecord(tp313, count10);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
+                    update();
                     break;
                 case 5:
                     db.addRecord(tp314, count11);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
+                    update();
                     break;
             }
 
@@ -325,51 +323,51 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
             switch(position){
                 case 0:
                     db.addRecord(tp309, count0);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
+                    update();
                     break;
                 case 1:
                     db.addRecord(tp309, count1);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
+                    update();
                     break;
                 case 2:
                     db.addRecord(tp310, count2);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
+                    update();
                     break;
                 case 3:
                     db.addRecord(tp310, count3);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
+                    update();
                     break;
                 case 4:
                     db.addRecord(tp310, count4);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
+                    update();
                     break;
                 case 5:
                     db.addRecord(tp310, count5);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
+                    update();
                     break;
                 case 6:
                     db.addRecord(tp311, count6);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
+                    update();
                     break;
                 case 7:
                     db.addRecord(tp311, count7);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
+                    update();
                     break;
                 case 8:
                     db.addRecord(tp312, count8);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
+                    update();
                     break;
                 case 9:
                     db.addRecord(tp312, count9);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
+                    update();
                     break;
                 case 10:
                     db.addRecord(tp313, count10);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
+                    update();
                     break;
                 case 11:
                     db.addRecord(tp314, count11);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
+                    update();
                     break;
             }
             showMessage("Счетчик добавлен");
@@ -512,6 +510,10 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
     public void onLoaderReset(Loader<Cursor> loader) {
 
     }
+	
+	private void update(){
+		getSupportLoaderManager().getLoader(0).forceLoad();
+	}
 
     static class DbCursorLoader extends CursorLoader{
         DbHelper db;

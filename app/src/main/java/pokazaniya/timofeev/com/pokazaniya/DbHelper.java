@@ -63,6 +63,14 @@ public class DbHelper extends SQLiteOpenHelper implements DbHelperHandler {
         }
     }
 
+	@Override
+	public Cursor getStatisticByCount(int countNumber)
+	{
+		SQLiteDatabase dbReader = getReadableDatabase();
+        Cursor cursor = dbReader.rawQuery("SELECT * FROM "+TABLE_NAME+" WHERE "+COUNT_NUMBER+"="+countNumber+" ORDER BY "+ID_KEY+";", null);
+		return cursor;
+	}
+
     public  void addRecord(String tp, String count){
         SQLiteDatabase writer = getWritableDatabase();
         ContentValues cv = new ContentValues();

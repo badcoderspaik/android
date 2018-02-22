@@ -9,6 +9,7 @@ public interface DbHelperHandler {
     public void removeRecord(long id);
     public void changeRecord(long id, String value);
     public void getStatisticByCount(int countNumber, ArrayList<Item> values, TableAdapter tableadapter);
-    public Cursor getAllRecords();
+    public Cursor getStatisticByCount(int countNumber);
+	public Cursor getAllRecords();
 
 }
