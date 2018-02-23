@@ -13,14 +13,6 @@ import java.util.Date;
 
 public class DbHelper extends SQLiteOpenHelper implements DbHelperHandler {
 
-    public static final int DB_VERSION = 2;
-    public static final String DB_NAME = "pokazaniya";
-    public static final String TABLE_NAME = "pok";
-    public static final String ID_KEY = "_id";
-    public static final String TP_NUMBER = "tp_number";
-    public static final String COUNT_NUMBER = "count_number";
-    public static final String VALUE = "value";
-    public static final String DATE = "date";
     SimpleDateFormat format = new SimpleDateFormat("dd.MM.yy");
     private String query;
     Context context;
@@ -49,18 +41,6 @@ public class DbHelper extends SQLiteOpenHelper implements DbHelperHandler {
         SQLiteDatabase reader = getReadableDatabase();
         Cursor cursor = reader.rawQuery("SELECT * FROM "+TABLE_NAME+";", null);
         return cursor;
-    }
-
-    @Override
-    public void getStatisticByCount(int countNumber, ArrayList<Item> values, TableAdapter tableadapter) {
-        SQLiteDatabase dbReader = getReadableDatabase();
-        Cursor cursor = dbReader.rawQuery("SELECT * FROM "+TABLE_NAME+" WHERE "+COUNT_NUMBER+"="+countNumber+" ORDER BY "+ID_KEY+";", null);
-        if(cursor.moveToFirst()){
-            do{
-                values.add(new Item(cursor.getInt(0),  cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4)));
-            }while (cursor.moveToNext());
-            tableadapter.notifyDataSetChanged();
-        }
     }
 
 	@Override
