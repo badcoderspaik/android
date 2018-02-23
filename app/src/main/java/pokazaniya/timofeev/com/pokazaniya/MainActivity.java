@@ -13,42 +13,90 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View; 
+import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
-import java.util.ArrayList;
+
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v4.content.Loader;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
-
+/**
+* главный класс приложения, точка входа
+* */
 public class MainActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
-
-    ArrayList<Item> values = new ArrayList<Item>();
-    TableAdapter tableadapter;
+    /**
+     *главный ListView приложения
+     */
     ListView thisListView;
+    /**
+     * объект для построения диалоговых окон
+     */
     AlertDialog.Builder builder;
-
+    /**
+     * класс базы данных
+     */
     DbHelper db = new DbHelper(this);
+    /**
+     * создает layout из ресурса R.layout.setvalue. Этот layout содержит текстовое поле ввода, которое служит для
+     * редактирования значения показаний
+     */
     LayoutInflater inflater;
-    View view;
+    /**
+     * layout из R.layout.setvalue, который содержит текстовое поле для редактирования значения показаний
+     */
+    View setValueView;
+    /**
+     * текстовое поле из R.layout.setvalue, служащее для редактирования значений показаний
+     */
     EditText et;
+    /**
+    * этой переменной будет присвоено значение AdapterView.AdapterContextMenuInfo.position. Свойство position этого класса
+    * содержит номер пункта ListView, на котором было вызвано контекстное меню. Переменная используется для вывода
+    * сообщения в Toast при удалении пункта записи из базы данных и пункта ListView соответственно.
+    * */
     int getItem;
+    /**
+    * этой переменной будет писвоено значение AdapterView.AdapterContextMenuInfo.id. Свойство id этого класса содержит
+    * _id записи из базы данных - primary key значение. Переменная используется при удалении записи из базы данных
+    * */
     long id;
+    /**
+     * переменная используется при вызове контекстного меню на пункте списка и равна getItem + 1
+     * нужна для корректного отображения номера удаленной записи в сообщении Toast, т.к. getItem начинается с 0,
+     * а нужно, чтоб счет начинался с 1
+     */
     int temp;
+    /**
+     * номера ТП и счетчиков из R.strings
+     */
     private String tp309, tp310, tp311, tp312, tp313, tp314;
     private String count0, count1, count2, count3, count4,
             count5, count6, count7, count8, count9, count10, count11;
+    /**
+     * Камера
+     */
     Camera camera;
+    /**
+     * параметры камеры
+     */
     Parameters parameters;
+    /**
+     * флаг, указывающий - включена камера или нет
+     */
     boolean ledIsChecked = false;
-    Menu menu;
+    /**
+     * массив строк номеров счетчиков из R.strings
+     */
     String[] countList;
     Cursor cursor;
+    /**
+     * Адаптер, к которому привязаны данные из базы
+     */
     SimpleCursorAdapter simpleCursorAdapter;
 
     @Override
@@ -78,182 +126,255 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
 
         countList = getResources().getStringArray(R.array.count);
 
-        tableadapter = new TableAdapter(this, values);
-        thisListView = (ListView)findViewById(R.id.mainListView1);
-        thisListView.setAdapter(tableadapter);
+        thisListView = (ListView) findViewById(R.id.mainListView1);
 
         inflater = LayoutInflater.from(this);
-        view = inflater.inflate(R.layout.setvalue, null);
-        et = (EditText)view.findViewById(R.id.setvalue);
-
+        setValueView = inflater.inflate(R.layout.setvalue, null);
+        et = (EditText) setValueView.findViewById(R.id.setvalue);
+        /**
+         * регистрация контекстного меню на ListView
+         */
         registerForContextMenu(thisListView);
-		
+        /**
+         * массив строк, содержащих имена столбцов в базе данных. Используется в SimpleCursorAdapter
+         */
         String[] from = {DbHelper.TP_NUMBER, DbHelper.COUNT_NUMBER, DbHelper.VALUE, DbHelper.DATE};
+        /**
+         * массив элементов из R.layout.table, в которые будут вставляться значения из базы данных.
+         * Используется в SimpleCursorAdpater
+         */
         int[] to = {R.id.tableTextView1, R.id.tableTextView2, R.id.tableTextView3, R.id.tableTextView4};
+        /**
+         * адаптер, связанный с базой данных
+         */
         simpleCursorAdapter = new SimpleCursorAdapter(this, R.layout.table, null, from, to, 0);
+        /**
+         * установка адаптера на ListView
+         */
         thisListView.setAdapter(simpleCursorAdapter);
+        /**
+         * LoaderManager, связанный с базой и адаптером, предназначенные для чтения данных из базы
+         */
         getSupportLoaderManager().initLoader(0, null, this);
     }
 
-    private  void showMessage(String message){
+    /**
+     * метод оболочка для вывода Toast сообщений
+     * @param message String выводимое сообщение
+     */
+    private void showMessage(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
 
-    private void getCamera(){
-        if(camera == null){
+    /**
+     * инициализация камеры
+     */
+    private void getCamera() {
+        if (camera == null) {
             camera = Camera.open();
             parameters = camera.getParameters();
         }
     }
 
-    private void ledOn(){
-        if(!ledIsChecked){
-            if(camera == null || parameters == null) return;
-            parameters = camera.getParameters();
-            parameters.setFlashMode(Parameters.FLASH_MODE_TORCH);
-            camera.setParameters(parameters);
-            camera.startPreview();
-            ledIsChecked = true;
+    /**
+     * включение led
+     */
+    private void ledOn() {
+        if (!ledIsChecked) {//если камера выключена
+            if (camera == null || parameters == null) return;//если камера не иницализирована - прервать выполнение метода
+            parameters = camera.getParameters();//иницализация параметров камеры
+            parameters.setFlashMode(Parameters.FLASH_MODE_TORCH);//включить led
+            camera.setParameters(parameters);//установить камере данные параметры
+            camera.startPreview();//стартануть камеру
+            ledIsChecked = true;// установить флаг в значение true
         }
     }
 
-    private void ledOff(){
-        if(ledIsChecked){
-            if(camera == null || parameters == null) return;
-            parameters = camera.getParameters();
-            parameters.setFlashMode(Parameters.FLASH_MODE_OFF);
-            camera.setParameters(parameters);
-            camera.stopPreview();
-            ledIsChecked = false;
+    /**
+     * выключение led
+     */
+    private void ledOff() {
+        if (ledIsChecked) {//если камера включена
+            if (camera == null || parameters == null) return;//если камера не инициализирована - превать метод
+            parameters = camera.getParameters();//инициализация параметров камеры
+            parameters.setFlashMode(Parameters.FLASH_MODE_OFF);//выключить led
+            camera.setParameters(parameters);//устанавить камере данные параметры
+            camera.stopPreview();//остановить камеру
+            ledIsChecked = false;//установить флаг в значение false
         }
     }
 
-    public  void turnLed(MenuItem item){
-        if(!ledIsChecked){
-            ledOn();
-            item.setTitle("LED ON");
-            item.setIcon(R.drawable.lighton);
-        } else {
-            ledOff();
-            item.setTitle("LED OFF");
-            item.setIcon(R.drawable.lightoff);
+    /**
+     * включение или отключение камеры. Метод вызывается из R.menu.settings
+     * @param item
+     */
+    public void turnLed(MenuItem item) {
+        if (!ledIsChecked) {//если фонарик выключен
+            ledOn();//включить фонарик
+            item.setTitle("LED ON");//изменить надпись пункта меню настроек
+            item.setIcon(R.drawable.lighton);//сменить иконку пункта меню настроек
+        } else {//иначе
+            ledOff();//выключить фонарик
+            item.setTitle("LED OFF");//изменить надпись пункта меню настроек
+            item.setIcon(R.drawable.lightoff);//сменить иконку пункта меню настроек
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        ledOff();
+        ledOff();//выключить фонарик, если он включен
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if(ledIsChecked) ledOn();
-        invalidateOptionsMenu();
+        if (ledIsChecked) ledOn();// включить фонарик, если флаг установлен в true
+        invalidateOptionsMenu();//обновить пункт меню списка настроек
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        getCamera();
+        getCamera();//инициализировать камеру
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if(camera != null){
-            camera.release();
+        if (camera != null) {
+            camera.release();//освободить камеру
             camera = null;
         }
     }
 
     @Override
     public void onBackPressed() {
-        showDialog(4);
+        showDialog(4);//вывести диалоговое окно при нажатии кнопки назад
     }
 
+    /**
+     * создание меню настроек
+     * @param menu
+     * @return
+     */
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = new MenuInflater(this);
         inflater.inflate(R.menu.settings, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
+    /**
+     * обновление меню настроек. Вызывается перед показом меню настроек
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem item = menu.getItem(2);
-        String title = item.getTitle().toString();
-        if(!ledIsChecked){
-            item.setTitle("LED OFF");
-            item.setIcon(R.drawable.lightoff);
-        }
-        else{
-            item.setTitle("LED ON");
-            item.setIcon(R.drawable.lighton);
+        MenuItem item = menu.getItem(2);//пункт меню управления фонариком
+        String title = item.getTitle().toString();// название пункта
+        if (!ledIsChecked) {//если false
+            item.setTitle("LED OFF");//сменить название пункта
+            item.setIcon(R.drawable.lightoff);//изменить иконку пункта
+        } else {//иначе
+            item.setTitle("LED ON");//сменить название пункта на другое
+            item.setIcon(R.drawable.lighton);//сменить иконку на другую
         }
         return super.onPrepareOptionsMenu(menu);
     }
 
+    /**
+     * создание контекстного меню
+     * @param menu
+     * @param v
+     * @param menuInfo
+     */
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo)
-    {
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         getMenuInflater().inflate(R.menu.context, menu);
     }
 
+    /**
+     * обработка нажатий на пункты контекстного меню
+     * @param item
+     * @return
+     */
     @Override
-    public boolean onContextItemSelected(MenuItem item)
-    {
+    public boolean onContextItemSelected(MenuItem item) {
+        /**
+         * в объекте данного класса хранится вся информация об элементе AdapterView, к которому
+         * привязано данное контекстное меню
+         */
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        /**
+         * позиция (int) элемента в AdapterView. Счет начинаетс с нуля
+         */
         getItem = info.position;
+        /**
+         * id элемента, который равен id записи в базе данных
+         */
         id = info.id;
+        /**
+         * временная переменная для корректного вывода позиции элемента, т.к. счет элементов начинается с нуля
+         */
         temp = getItem + 1;
 
-        switch(item.getItemId()){
-            case R.id.item_remove:
+        switch (item.getItemId()) {
+            case R.id.item_remove://если выбран пункт "Удалить" - вызвать соотвествующий диалог
                 showDialog(5);
                 return true;
 
-            case R.id.item_change:
+            case R.id.item_change://если выбран пункт "Изменить" - вызвать соответствующий диалог
                 showDialog(3);
         }
         return super.onContextItemSelected(item);
     }
 
+    /**
+     * метод построения диалоговых окон. Какой диалог будет отображен, зависит от того, какой пункт
+     * контекстного меню или меню настроек будет выбран или же будет нажата системная кнопка "Назад"
+     * @param id
+     * @return
+     */
     @Override
-    protected Dialog onCreateDialog(int id)
-    {
-        switch(id){
-            case 1:
-                String[] tpList = getResources().getStringArray(R.array.tp);
-                builder = new AlertDialog.Builder(this);
-                builder.setTitle(R.string.selectTp);
+    protected Dialog onCreateDialog(int id) {
+        switch (id) {
+            case 1://если в метод showDialog() передан параметр 1
+                String[] tpList = getResources().getStringArray(R.array.tp);//массив строк с номерами ТП из ресурса R.strings
+                builder = new AlertDialog.Builder(this);//объект диалогового окна
+                builder.setTitle(R.string.selectTp);//установить заголовок окна
+                /**
+                 * заполнить диалоговое окно списком с одиночным выбором типа radiobutton:
+                 * tpList - массив строк с номерами ТП из ресурса R.strings
+                 * -1 - не устанавливать ни один из пунктов списка как активный
+                 * addTpListener - слушатель нажатия на пункт списка
+                 */
                 builder.setSingleChoiceItems(tpList, -1, addTpListener);
                 return builder.create();
-            case 2:
+            case 2://если в метод showDialog() передан параметр 2
                 builder = new AlertDialog.Builder(this);
                 builder.setTitle(R.string.selectCount);
                 builder.setSingleChoiceItems(countList, -1, addCountListener);
                 return builder.create();
-            case 3:
+            case 3://если в метод showDialog() передан параметр 3
                 builder = new AlertDialog.Builder(this);
-                builder.setView(view);
+                builder.setView(setValueView);//заполнить диалоговое окно лайотом из R.layout.setvalue, который содержит текстовое поле для редактирования значения показаний
                 builder.setTitle("Ввести показания");
-                builder.setIcon(R.drawable.edit);
-                builder.setPositiveButton(R.string.insert, setValueListener);
-                builder.setNegativeButton(R.string.cancel, setValueListener);
+                builder.setIcon(R.drawable.edit);//установить иконку окна
+                builder.setPositiveButton(R.string.insert, setValueListener);//установить кнопки для диалогового
+                builder.setNegativeButton(R.string.cancel, setValueListener);//окна и слушатели на них
                 return builder.create();
-            case 4:
+            case 4://если в метод showDialog() передан параметр 4
                 builder = new AlertDialog.Builder(this);
                 builder.setTitle(R.string.exit);
-                builder.setMessage(R.string.exitFromApp);
+                builder.setMessage(R.string.exitFromApp);//установить в качестве содержимого окна сообщение
                 builder.setIcon(R.drawable.exit);
                 builder.setPositiveButton(R.string.yes, exitListener);
                 builder.setNegativeButton(R.string.no, exitListener);
                 return builder.create();
-            case 5:
+            case 5://если в метод showDialog() передан параметр 5
                 builder = new AlertDialog.Builder(this);
                 builder.setTitle(R.string.alert);
                 builder.setMessage(R.string.removeRecord);
@@ -261,66 +382,71 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
                 builder.setPositiveButton(R.string.remove, removeRecordListener);
                 builder.setNegativeButton(R.string.no, removeRecordListener);
                 return builder.create();
-            case 6:
+            case 6://если в метод showDialog() передан параметр 6
                 builder = new AlertDialog.Builder(this);
                 builder.setTitle(R.string.statisticByCount);
-                builder.setItems(countList, statisticByCountListener);
+                builder.setItems(countList, statisticByCountListener);//установить в качестве содержимого окна обычный список
                 return builder.create();
 
-            default: return null;
+            default:
+                return null;
         }
 
     }
 
-    DialogInterface.OnClickListener addTpListener = new DialogInterface.OnClickListener(){
+    /**
+     * объект интерфейса будет установлен в качестве слушателя действия "добавить ТП" из меню настрек
+     */
+    DialogInterface.OnClickListener addTpListener = new DialogInterface.OnClickListener() {
 
         @Override
-        public void onClick(DialogInterface p1, int position)
-        {
-            switch(position){
-                case 0:
+        public void onClick(DialogInterface p1, int position) {
+            switch (position) {
+                case 0://если нажат пункт 0 в списке
                     db.addRecord(tp309, count0);
                     db.addRecord(tp309, count1);
                     update();
                     break;
-                case 1:
+                case 1://если нажат пункт 1 в списке
                     db.addRecord(tp310, count2);
                     db.addRecord(tp310, count3);
                     db.addRecord(tp310, count4);
                     db.addRecord(tp310, count5);
                     update();
                     break;
-                case 2:
+                case 2://если нажат пункт 2 в списке
                     db.addRecord(tp311, count6);
                     db.addRecord(tp311, count7);
                     update();
                     break;
-                case 3:
+                case 3://если нажат пункт 3 в списке
                     db.addRecord(tp312, count8);
                     db.addRecord(tp312, count9);
                     update();
                     break;
-                case 4:
+                case 4://если нажат пункт 4 в списке
                     db.addRecord(tp313, count10);
                     update();
                     break;
-                case 5:
+                case 5://если нажат пункт 5 в списке
                     db.addRecord(tp314, count11);
                     update();
                     break;
             }
 
-            showMessage("ТП добавлена");
+            showMessage("ТП добавлена");//отобразить сообщение
 
         }
 
     };
-    DialogInterface.OnClickListener addCountListener = new DialogInterface.OnClickListener(){
+    /**
+     * объект интерфейса будет установлен в качестве слушателя действия "добавить счетчик" из меню настрек
+     */
+    DialogInterface.OnClickListener addCountListener = new DialogInterface.OnClickListener() {
 
         @Override
-        public void onClick(DialogInterface p1, int position)
-        {
-            switch(position){
+        public void onClick(DialogInterface p1, int position) {
+            switch (position) {
                 case 0:
                     db.addRecord(tp309, count0);
                     update();
@@ -373,65 +499,77 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
             showMessage("Счетчик добавлен");
         }
     };
-
-    DialogInterface.OnClickListener exitListener = new DialogInterface.OnClickListener(){
+    /**
+     * объект этого интерфейса устанавливается в качестве слушателя пункта меню настроек "Выход" или
+     * нажатия системной кнопки "Назад"
+     */
+    DialogInterface.OnClickListener exitListener = new DialogInterface.OnClickListener() {
 
         @Override
-        public void onClick(DialogInterface dialog, int which)
-        {
-            switch(which){
-                case Dialog.BUTTON_POSITIVE:
-                    finish();
+        public void onClick(DialogInterface dialog, int which) {
+            switch (which) {
+                case Dialog.BUTTON_POSITIVE://если нажата кнопка "Выйти"
+                    finish();// завершить работу приложения
                     break;
-                case Dialog.BUTTON_NEGATIVE:
-                    break;
+                case Dialog.BUTTON_NEGATIVE:// если нажата кнопка "Отмена"
+                    break;// просто скрыть диалоговое окно и остаться в приложении
             }
         }
     };
-
-    DialogInterface.OnClickListener setValueListener = new DialogInterface.OnClickListener(){
-
-        @Override
-        public void onClick(DialogInterface dialog, int which)
-        {
-            switch(which){
-                case Dialog.BUTTON_POSITIVE:
-                    String value = et.getText().toString();
-                    db.changeRecord(id, value);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
-                    break;
-                case Dialog.BUTTON_NEGATIVE:
-                    break;
-            }
-        }
-
-
-    };
-
-    DialogInterface.OnClickListener removeRecordListener = new DialogInterface.OnClickListener(){
+    /**
+     * объект данного интерфейса устанавливается в качестве слушателя события выбора пункта контекстного
+     * меню "Изменить"
+     */
+    DialogInterface.OnClickListener setValueListener = new DialogInterface.OnClickListener() {
 
         @Override
-        public void onClick(DialogInterface p1, int which)
-        {
-            switch(which){
-                case Dialog.BUTTON_POSITIVE:
-                    db.removeRecord(id);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
-                    showMessage("Запись "+temp+" удалена");
+        public void onClick(DialogInterface dialog, int which) {
+            switch (which) {
+                case Dialog.BUTTON_POSITIVE://если нажата кнопка "Изменить"
+                    String value = et.getText().toString();//получить данные, введенные в текстовое поле
+                    db.changeRecord(id, value);//изменить данные в базе данных
+                    update();//обновить
                     break;
-                case Dialog.BUTTON_NEGATIVE:
+                case Dialog.BUTTON_NEGATIVE://если нажата кнопка "Оменить" - ничего не делать
                     break;
             }
         }
 
-    };
 
-    DialogInterface.OnClickListener statisticByCountListener = new DialogInterface.OnClickListener(){
+    };
+    /**
+     * объект данного интерфейса устанавливается в качестве слушателя события выбора контекстного меню "Удалить"
+     */
+    DialogInterface.OnClickListener removeRecordListener = new DialogInterface.OnClickListener() {
+
+        @Override
+        public void onClick(DialogInterface p1, int which) {
+            switch (which) {
+                case Dialog.BUTTON_POSITIVE://если нажата кнопка "Удалить"
+                    db.removeRecord(id);//удалить запись с указанным id из базы
+                    update();//обновить интерфейс
+                    showMessage("Запись " + temp + " удалена");//вывести сообщение
+                    break;
+                case Dialog.BUTTON_NEGATIVE:// если нажата кнопка "Отмена"
+                    break;//ничего не делать и просто скрыть диалоговое окно
+            }
+        }
+
+    };
+    /**
+     * объект данного интерфейса устанавливается в качестве слушателя выбора пункта меню настроек
+     * "Статистика по счетчику"
+     */
+    DialogInterface.OnClickListener statisticByCountListener = new DialogInterface.OnClickListener() {
 
         @Override
         public void onClick(DialogInterface dialogInterface, int position) {
+            /**
+             * intent для перехода на StatisticByCountActivity
+             * эта активность отображает ListView со статистикой по выбранному номеру счетчика
+             */
             Intent statisticByCountIntent = new Intent(MainActivity.this, StatisticByCountActivity.class);
-            switch (position){
+            switch (position) {
                 case 0:
                     sendMessage(statisticByCountIntent, 100964);
                     break;
@@ -472,35 +610,56 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
         }
     };
 
-    private void sendMessage(Intent intent, int countNumber){
+    /**
+     * метод инкапсулирует отправку сообщения с помощью параметра intent
+     * в сообщении передается номер счетчика в параметре countNumber
+     * @param intent
+     * @param countNumber
+     */
+    private void sendMessage(Intent intent, int countNumber) {
+        //отправить сообщение с именем "countNumber" и значением параметра countNumber
         intent.putExtra("countNumber", countNumber);
+        //перейти на активность intent
         startActivity(intent);
     }
-
-    public void showSelectTpDialog(MenuItem item){
+    //метод вызыватся при нажатии на пункт меню настроек "Статистика по счетчику"
+    public void showSelectTpDialog(MenuItem item) {
         showDialog(1);
     }
-
-
-    public void showSelectCountDialog(MenuItem item){
+    //метод вызыватся при нажатии на пункт меню настроек "Добавить счетчик"
+    public void showSelectCountDialog(MenuItem item) {
         showDialog(2);
     }
-
-    public void showSetValueDialog(MenuItem item){
+    //метод вызыватся при нажатии на пункт контекстного меню "Изменить"
+    public void showSetValueDialog(MenuItem item) {
         showDialog(3);
     }
-
-    public void showExitDialog(MenuItem item){
+    //метод вызыватся при нажатии на пункт меню настроек "выход" или на системную кнопку "Назад"
+    public void showExitDialog(MenuItem item) {
         showDialog(4);
     }
+    //метод вызывается при нажатии на пункт меню настроек "Статистика по номеру счетчика"
+    public void showStatisticByCountDialog(MenuItem item) {
+        showDialog(6);
+    }
+    //в следующих трех методах происхдит работа с асинхронным манипулированием данных из базы
 
-    public void showStatisticByCountDialog(MenuItem item){showDialog(6);}
-
+    /**
+     *Именно в этом методе создается инициализированный в строке 158 загрузчик
+     * @param i
+     * @param bundle
+     * @return
+     */
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return new DbCursorLoader(this, db);
     }
 
+    /**
+     * вызывается, когда созданный загрузчик завершил загрузку
+     * @param loader
+     * @param cursor
+     */
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         simpleCursorAdapter.swapCursor(cursor);
@@ -510,15 +669,22 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
     public void onLoaderReset(Loader<Cursor> loader) {
 
     }
-	
-	private void update(){
-		getSupportLoaderManager().getLoader(0).forceLoad();
-	}
 
-    static class DbCursorLoader extends CursorLoader{
+    /**
+     * метод-оболочка над методом загрузчика forceLoad(), который при вызове заново читает данные из связанного с ним источника
+     */
+    private void update() {
+        getSupportLoaderManager().getLoader(0).forceLoad();
+    }
+
+    /**
+     * наследник класса CursorLoader. В нем переопределен метод loadInBackground(), в котором происходит получение
+     * курсора, с помощью которого читаются данные из базы
+     */
+    static class DbCursorLoader extends CursorLoader {
         DbHelper db;
 
-        public DbCursorLoader(Context context, DbHelper db){
+        public DbCursorLoader(Context context, DbHelper db) {
             super(context);
             this.db = db;
         }
