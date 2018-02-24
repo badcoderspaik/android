@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -25,10 +26,13 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v4.content.Loader;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
+
+import dialogs.AddTpDialog;
+
 /**
 * главный класс приложения, точка входа
 * */
-public class MainActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+public class MainActivity extends AppCompatActivity implements LoaderCallbacks<Cursor>, UiUpdater {
     /**
      *главный ListView приложения
      */
@@ -341,18 +345,6 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
     @Override
     protected Dialog onCreateDialog(int id) {
         switch (id) {
-            case 1://если в метод showDialog() передан параметр 1
-                String[] tpList = getResources().getStringArray(R.array.tp);//массив строк с номерами ТП из ресурса R.strings
-                builder = new AlertDialog.Builder(this);//объект диалогового окна
-                builder.setTitle(R.string.selectTp);//установить заголовок окна
-                /**
-                 * заполнить диалоговое окно списком с одиночным выбором типа radiobutton:
-                 * tpList - массив строк с номерами ТП из ресурса R.strings
-                 * -1 - не устанавливать ни один из пунктов списка как активный
-                 * addTpListener - слушатель нажатия на пункт списка
-                 */
-                builder.setSingleChoiceItems(tpList, -1, addTpListener);
-                return builder.create();
             case 2://если в метод showDialog() передан параметр 2
                 builder = new AlertDialog.Builder(this);
                 builder.setTitle(R.string.selectCount);
@@ -622,9 +614,10 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
         //перейти на активность intent
         startActivity(intent);
     }
-    //метод вызыватся при нажатии на пункт меню настроек "Статистика по счетчику"
+    //метод вызыватся при нажатии на пункт меню настроек "Добавить ТП"
     public void showSelectTpDialog(MenuItem item) {
-        showDialog(1);
+        AddTpDialog tpDialog = new AddTpDialog();
+        tpDialog.show(getSupportFragmentManager(),"addTpDialog");
     }
     //метод вызыватся при нажатии на пункт меню настроек "Добавить счетчик"
     public void showSelectCountDialog(MenuItem item) {
@@ -673,8 +666,9 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
     /**
      * метод-оболочка над методом загрузчика forceLoad(), который при вызове заново читает данные из связанного с ним источника
      */
-    private void update() {
+    public void update() {
         getSupportLoaderManager().getLoader(0).forceLoad();
+        showMessage("Тп добавлена");
     }
 
     /**

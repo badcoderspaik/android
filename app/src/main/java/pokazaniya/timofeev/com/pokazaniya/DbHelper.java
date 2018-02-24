@@ -5,10 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -22,7 +20,11 @@ public class DbHelper extends SQLiteOpenHelper implements DbHelperHandler {
     /**
      * строка запроса для БД, в которой создается основная таблица БД приложения
      */
-    private String query;
+    private String createMainTable;
+    /**
+     * строка запроса для БД, в которой саздается таблица, в которую будут попадать записи, удаленные из основной таблицы
+     */
+    private  String createTrashTable;
     /**
      * контекст
      */
@@ -44,12 +46,13 @@ public class DbHelper extends SQLiteOpenHelper implements DbHelperHandler {
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
-        query = "CREATE TABLE IF NOT EXISTS "+TABLE_NAME+"("+ID_KEY+" INTEGER PRIMARY KEY AUTOINCREMENT, tp_number TEXT, count_number TEXT, value TEXT, date TEXT)";
+        createMainTable = "CREATE TABLE IF NOT EXISTS "+TABLE_NAME+"("+ID_KEY+" INTEGER PRIMARY KEY AUTOINCREMENT, tp_number TEXT, count_number TEXT, value TEXT, date TEXT)";
+        //createTrashTable = "CREATE TABLE IF NOT EXISTS "+TABLE_TRASH+"("
         //Toast.makeText(context, "База данных создана", Toast.LENGTH_SHORT).show();
         /**
          * выполнение запроса к базе
          */
-        db.execSQL(query);
+        db.execSQL(createMainTable);
     }
 
     /**
